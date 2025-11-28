@@ -62,7 +62,7 @@ userSchema.pre("save", async function(next) {
 } );
 
 //method to check if entered password is correct, "method" is an object where any no. of custom methods can be added. "isPasswordCorrect" is a custom method
-userSchema.method.isPasswordCorrect = async function(password){
+userSchema.methods.isPasswordCorrect = async function(password){
     return await bcrypt.compare(password, this.password);
 }
 

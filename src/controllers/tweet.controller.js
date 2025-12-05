@@ -36,24 +36,24 @@ const createTweet = asyncHandler(async (req, res) => {
 
 const updateTweet = asyncHandler(async (req, res) => {
     const { content } = req.body;
-    const { _id } = req.params;
+    const { tweetId } = req.params;
 
-    if (!_id || !content) {
+    if (!tweetId || !content) {
         throw new ApiError(400, "both tweetId and updatedTweet required");
     }
 
-    const tweet = await Tweet.findById(_id);
+    const tweet = await Tweet.findById(tweetId);
 
     if (!tweet) {
         throw new ApiError(404, "Tweet not found");
     }
 
-    if ( !tweet.owner.equals(req.user._id) ) {
+    if ( !tweet.owner.equals(req.user.tweetId) ) {
         throw new ApiError(403, "users other than owner cannot edit the tweet.");
     }
 
     const updatedTweet = await Tweet.findByIdAndUpdate(
-        _id,
+        tweetId,
         {
             $set: {
                 content: content
@@ -80,23 +80,23 @@ const updateTweet = asyncHandler(async (req, res) => {
 })
 
 const deleteTweet = asyncHandler(async (req, res) => {
-    const { _id } = req.body;
+    const { tweetId } = req.params;
 
-    if (!_id) {
+    if (!tweetId) {
         throw new ApiError(400, "tweet id is required.");
     }
 
-    const tweet = await Tweet.findById(_id);
+    const tweet = await Tweet.findById(tweetId);
 
     if (!tweet) {
         throw new ApiError(404, "Tweet not found");
     }
 
-    if ( !tweet.owner.equals(req.user._id) ) {
+    if ( !tweet.owner.equals(req.user.tweetId) ) {
         throw new ApiError(403, "users other than owner cannot delete the tweet.");
     }
 
-    const deletedTweet = await Tweet.deleteOne({ _id });
+    const deletedTweet = await Tweet.deleteOne({ tweetId });
 
     if (deletedTweet.deletedCount === 0) {
         throw new ApiError(500, "failed to delete the tweet.");
@@ -114,7 +114,7 @@ const deleteTweet = asyncHandler(async (req, res) => {
 })
 
 const getUserTweets = asyncHandler(async (req, res) => {
-    const { id: userId } = req.params;
+    const { userId } = req.params;
 
     if (!userId) {
         throw new ApiError(400, "no user found");

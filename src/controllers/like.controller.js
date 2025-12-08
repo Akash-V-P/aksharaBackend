@@ -13,7 +13,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
     const likedVideo = await Like.find(
         {
-            videoId,
+            video: videoId,
             likedBy: req.user?._id
         }
     )
@@ -22,7 +22,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
         const unlike = await Like.findByIdAndDelete(
             {
-                videoId,
+                video: videoId,
                 likedBy: req.user?._id
             }
         )
@@ -45,7 +45,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
         const like = await Like.create(
             {
-                videoId,
+                video: videoId,
                 likedBy: req.user?._id
             }
         )
@@ -68,6 +68,69 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
 })
 
+const toggleBookLike = asyncHandler(async (req, res) => {
+    const { bookId } = req.params
+
+    if (!bookId) {
+        throw new ApiError(400, "book id is required");
+    }
+
+    const likedBook = await Like.find(
+        {
+            book: bookId,
+            likedBy: req.user?._id
+        }
+    )
+
+    if (likedBook) {
+        const unlike = await Like.findByIdAndDelete(
+            {
+                book: bookId,
+                likedBy: req.user?._id
+            }
+        )
+
+        if (!unlike) {
+            throw new ApiError(500, "could not unlike the book")
+        }
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    unlike,
+                    "unliked the book successfully"
+                )
+            )
+    }
+    else {
+
+        const like = await Like.create(
+            {
+                book: bookId,
+                likedBy: req.user?._id
+            }
+        )
+
+        if (!like) {
+            throw new ApiError(500, "could not like the book")
+        }
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    like,
+                    "successfully like the book"
+                )
+            )
+    }
+
+
+})
+
 const toggleCommentLike = asyncHandler(async (req, res) => {
     const { commentId } = req.params
 
@@ -77,7 +140,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 
     const likedComment = await Like.find(
         {
-            commentId,
+            commnet: commentId,
             likedBy: req.user?._id
         }
     )
@@ -86,7 +149,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 
         const unlike = await Like.findByIdAndDelete(
             {
-                commentId,
+                commnet: commentId,
                 likedBy: req.user?._id
             }
         )
@@ -109,7 +172,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 
         const like = await Like.create(
             {
-                commentId,
+                commnet: commentId,
                 likedBy: req.user?._id
             }
         )
@@ -140,7 +203,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 
     const likedTweet = await Like.find(
         {
-            tweetId,
+            tweet: tweetId,
             likedBy: req.user?._id
         }
     )
@@ -149,7 +212,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 
         const unlike = await Like.findByIdAndDelete(
             {
-                tweetId,
+                tweet: tweetId,
                 likedBy: req.user?._id
             }
         )
@@ -172,7 +235,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 
         const like = await Like.create(
             {
-                tweetId,
+                tweet: tweetId,
                 likedBy: req.user?._id
             }
         )
@@ -266,9 +329,156 @@ const getLikedVideos = asyncHandler(async (req, res) => {
         )
 })
 
+const getLikedBooks = asyncHandler(async (req, res) => {
+    const userId = req.user?._id;
+
+    const likedBooks = await Like.aggregate(
+        [
+            {
+                $match: {
+                    likedBy: new mongoose.Types.ObjectId(userId)
+                }
+            },
+            {
+                $lookup: {
+                    from: "books",
+                    localField: "book",
+                    foreignField: "_id",
+                    as: "book",
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "users",
+                                localField: "owner",
+                                foreignField: "_id",
+                                as: "owner",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            username: 1,
+                                            fullName: 1,
+                                            avatar: 1
+                                        }
+                                    }
+                                ]
+                            }
+
+                        },
+                        {
+                            $addFields: {
+                                owner: {
+                                    $first: "$owner"
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields: {
+                    book: {
+                        $first: "$book"
+                    }
+                }
+            },
+            {
+                $project: {
+                    book: 1,
+                    likedBy: 1
+                }
+            }
+        ]
+    )
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                likedBooks,
+                "liked books fetched successfully"
+            )
+        )
+})
+
+const getLikedTweets = asyncHandler(async (req, res) => {
+    const userId = req.user?._id;
+
+    const likedTweet = await Like.aggregate(
+        [
+            {
+                $match: {
+                    likedBy: new mongoose.Types.ObjectId(userId)
+                }
+            },
+            {
+                $lookup: {
+                    from: "tweets",
+                    localField: "tweet",
+                    foreignField: "_id",
+                    as: "tweet",
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "users",
+                                localField: "owner",
+                                foreignField: "_id",
+                                as: "owner",
+                                pipeline: [
+                                    {
+                                        $project: {
+                                            username: 1,
+                                            fullName: 1,
+                                            avatar: 1
+                                        }
+                                    }
+                                ]
+                            }
+
+                        },
+                        {
+                            $addFields: {
+                                owner: {
+                                    $first: "$owner"
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                $addFields: {
+                    tweet: {
+                        $first: "$tweet"
+                    }
+                }
+            },
+            {
+                $project: {
+                    tweet: 1,
+                    likedBy: 1
+                }
+            }
+        ]
+    )
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                likedTweet,
+                "tweet books fetched successfully"
+            )
+        )
+})
+
 export {
     toggleCommentLike,
     toggleTweetLike,
     toggleVideoLike,
-    getLikedVideos
+    getLikedVideos,
+    getLikedBooks,
+    toggleBookLike,
+    getLikedTweets
 }

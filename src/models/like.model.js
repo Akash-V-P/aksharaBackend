@@ -14,10 +14,14 @@ const likeSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "Tweet"
         },
+        book: {
+            type: Schema.Types.ObjectId,
+            ref: "Book"
+        },
         likedBy: {
             type: Schema.Types.ObjectId,
             ref: "User"
-        }
+        },
     },
     {
         timestamps: true

@@ -1,7 +1,7 @@
 import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asyncHandler";
-import Tweet from "../models/tweet.model"
 import { ApiResponse } from "../utils/ApiResponse";
+import Tweet from "../models/tweet.model"
 import mongoose from "mongoose";
 
 const createTweet = asyncHandler(async (req, res) => {
@@ -48,7 +48,7 @@ const updateTweet = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Tweet not found");
     }
 
-    if ( !tweet.owner.equals(req.user.tweetId) ) {
+    if ( !tweet.owner.equals(req.user._id) ) {
         throw new ApiError(403, "users other than owner cannot edit the tweet.");
     }
 

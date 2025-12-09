@@ -28,6 +28,7 @@ import dashboardRouter from "./routes/dashboard.routes.js"
 import likeRouter from "./routes/like.routes.js"
 import BookRouter from "./routes/book.routes.js"
 import viewRouter from "./routes/view.routes.js"
+import featureRouter from "./routes/feature.routes.js"
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
@@ -40,5 +41,6 @@ app.use("/api/v1/dashboard", dashboardRouter)
 app.use("/api/v1/like", likeRouter)
 app.use("/api/v1/Book", BookRouter)
 app.use("/api/v1/view", viewRouter)
+app.use("/api/v1/feature", featureRouter)
 
 export { app };

@@ -32,7 +32,7 @@ import featureRouter from "./routes/feature.routes.js"
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/tweets", tweetRouter);
+app.use("/api/v1/tweet", tweetRouter);
 app.use("/api/v1/video", videoRouter)
 app.use("/api/v1/subscription", subscriptionRouter)
 app.use("/api/v1/playlist", playlistRouter)

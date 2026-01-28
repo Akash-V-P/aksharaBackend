@@ -14,11 +14,11 @@ router.route("/").get(getAllBooks)
                     upload.fields(
                         [
                             {
-                                name: bookFile,
+                                name: "bookFile",
                                 maxCount: 1
                             },
                             {
-                                name: coverImage,
+                                name: "coverImage",
                                 maxCount: 1
                             }
                         ]

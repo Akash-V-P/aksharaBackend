@@ -45,6 +45,6 @@ const bookSchema = new Schema(
     }
 );
 
-videoSchema.plugin(mongooseAggregatePaginate);
+bookSchema.plugin(mongooseAggregatePaginate);
 
 export const Book = mongoose.model("Book", bookSchema);

@@ -1,5 +1,6 @@
-import { Like } from "../models/like.model"
-import { View } from "../models/view.model"
+import { Like } from "../models/like.model.js"
+import { View } from "../models/view.model.js"
+import { asyncHandler } from "../utils/asyncHandler.js"
 
 
 const getTopTenLikedBooks = asyncHandler(async (req, res) => {
